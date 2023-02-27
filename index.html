@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h1>To-Do List</h1>
+    <form id="todo-form">
+      <label for="todo-input">New To-Do:</label>
+      <input type="text" id="todo-input" name="todo" required>
+      <button type="submit">Add</button>
+    </form>
+    <ul id="todo-list">
+      <!-- Add your to-do items here dynamically using JavaScript -->
+    </ul>
+    
+    <script>
+      const form = document.getElementById('todo-form');
+      const input = document.getElementById('todo-input');
+      const list = document.getElementById('todo-list');
+      let todos = [];
+      
+      // Load saved todos from local storage on page load
+      if (localStorage.getItem('todos')) {
+        todos = JSON.parse(localStorage.getItem('todos'));
+        renderTodos();
+      }
+      
+      // Add a new todo item
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const todo = {
+          id: Date.now(),
+          text: input.value.trim(),
+        };
+        todos.push(todo);
+        input.value = '';
+        saveTodos();
+        renderTodos();
+      });
+      
+      // Remove a todo item
+      function deleteTodo(id) {
+        todos = todos.filter(todo => todo.id !== id);
+        saveTodos();
+        renderTodos();
+      }
+      
+      // Render all the todo items
+      function renderTodos() {
+        list.innerHTML = '';
+        todos.forEach(todo => {
+          const li = document.createElement('li');
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = todo.text;
+          input.addEventListener('change', () => {
+            todo.text = input.value.trim();
+            saveTodos();
+          });
+          const button = document.createElement('button');
+          button.textContent = 'Delete';
+          button.addEventListener('click', () => deleteTodo(todo.id));
+          li.appendChild(input);
+          li.appendChild(button);
+          list.appendChild(li);
+        });
+      }
+      
+      // Save todos to local storage
+      function saveTodos() {
+        localStorage.setItem('todos', JSON.stringify(todos));
+      }
+    </script>
+  </body>
+</html>
